@@ -18,14 +18,18 @@ export class CategoriesService {
     return await this.categoryRepository.findOne(id);
   }
 
-  async update(
-    id: string,
-    payload: UpdateCategoryDto,
-  ): Promise<Category> {
+  async update(id: string, payload: UpdateCategoryDto): Promise<Category> {
     return await this.categoryRepository.update(id, payload);
   }
 
   async remove(id: string): Promise<Category> {
     return await this.categoryRepository.remove(id);
+  }
+
+  async checkSlugAvailability(
+    slug: string,
+    categoryId?: string,
+  ): Promise<boolean> {
+    return await this.categoryRepository.isSlugAvailable(slug, categoryId);
   }
 }

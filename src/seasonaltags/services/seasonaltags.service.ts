@@ -28,4 +28,11 @@ export class SeasonaltagsService {
   async remove(id: string): Promise<Seasonaltag> {
     return await this.seasonaltagRepository.remove(id);
   }
+
+  async checkSlugAvailability(
+    slug: string,
+    id?: string,
+  ): Promise<boolean> {
+    return await this.seasonaltagRepository.isSlugAvailable(slug, id);
+  }
 }

@@ -3,9 +3,10 @@ import {
   Get,
   Post,
   Body,
-  Patch,
+  Put,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { SeasonaltagsService } from '../services/seasonaltags.service';
 import { CreateSeasonaltagDto, UpdateSeasonaltagDto } from '../dto';
@@ -30,7 +31,7 @@ export class SeasonaltagsController {
     return await this.seasonaltagsService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   async update(
     @Param('id') id: string,
     @Body() payload: UpdateSeasonaltagDto,
@@ -41,5 +42,26 @@ export class SeasonaltagsController {
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<Seasonaltag> {
     return await this.seasonaltagsService.remove(id);
+  }
+
+  @Get('check-slug')
+  async checkSlug(
+    @Query('slug') slug: string,
+    @Query('id') id?: string,
+  ): Promise<{ message: string; isAvailable: boolean }> {
+    slug = slug.trim();
+    const isAvailable = await this.seasonaltagsService.checkSlugAvailability(
+      slug,
+      id,
+    );
+
+    if (isAvailable) {
+      return {
+        message: `Slug '${slug}' is available and can be used.`,
+        isAvailable: true,
+      };
+    } else {
+      return { message: `Slug '${slug}' already exists.`, isAvailable: false };
+    }
   }
 }
