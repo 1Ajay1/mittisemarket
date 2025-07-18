@@ -12,6 +12,15 @@ export class CategoryRepository {
   ) {}
 
   async create(payload: CreateCategoryDto): Promise<Category> {
+    const isSlugExist = await this.categoryModel
+          .findOne({
+            slug: payload.slug,
+          })
+          .lean();
+        if (isSlugExist) {
+          throw new NotFoundException('Slug already exists');
+        }
+       
     return await this.categoryModel.create(payload);
   }
 
@@ -28,6 +37,14 @@ export class CategoryRepository {
   }
 
   async update(id: string, payload: UpdateCategoryDto): Promise<Category> {
+    const isSlugExist = await this.categoryModel
+          .findOne({
+            slug: payload.slug,
+          })
+          .lean();
+        if (isSlugExist) {
+          throw new NotFoundException('Slug already exists');
+        }
     const category = await this.categoryModel.findByIdAndUpdate(id, payload, {
       new: true,
     });
@@ -43,5 +60,14 @@ export class CategoryRepository {
       throw new NotFoundException(`Category is not found with the ${id}`);
     }
     return category;
+  }
+
+  async isSlugAvailable(slug: string, categoryId?: string): Promise<boolean> {
+    const query = { 'slug': slug };
+    if (categoryId) {
+      query['_id'] = { $ne: categoryId };
+    }
+    const count = await this.categoryModel.countDocuments(query);
+    return count === 0;
   }
 }

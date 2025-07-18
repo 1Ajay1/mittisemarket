@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Query, Put } from '@nestjs/common';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dto';
 import { CategoriesService } from '../services/categories.service';
 
@@ -7,8 +7,8 @@ export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoriesService.create(createCategoryDto);
+  create(@Body() payload: CreateCategoryDto) {
+    return this.categoriesService.create(payload);
   }
 
   @Get()
@@ -21,7 +21,7 @@ export class CategoriesController {
     return this.categoriesService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
     return this.categoriesService.update(id, updateCategoryDto);
   }
@@ -29,5 +29,26 @@ export class CategoriesController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(id);
+  }
+
+  @Get('check-slug')
+  async checkSlug(
+    @Query('slug') slug: string,
+    @Query('categoryId') categoryId?: string,
+  ): Promise<{ message: string; isAvailable: boolean }> {
+    slug = slug.trim();
+    const isAvailable = await this.categoriesService.checkSlugAvailability(
+      slug,
+      categoryId,
+    );
+
+    if (isAvailable) {
+      return {
+        message: `Slug '${slug}' is available and can be used.`,
+        isAvailable: true,
+      };
+    } else {
+      return { message: `Slug '${slug}' already exists.`, isAvailable: false };
+    }
   }
 }

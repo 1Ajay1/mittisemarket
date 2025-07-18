@@ -6,7 +6,6 @@ import { ProductsModule } from './products/products.module';
 import { RegionModule } from './region/region.module';
 import { FarmersModule } from './farmers/farmers.module';
 import { CategoriesModule } from './categories/categories.module';
-import { SeasonalTagModule } from './seasonal-tag/seasonal-tag.module';
 import { SeasonaltagsModule } from './seasonaltags/seasonaltags.module';
 
 @Module({
@@ -16,7 +15,6 @@ import { SeasonaltagsModule } from './seasonaltags/seasonaltags.module';
     RegionModule,
     FarmersModule,
     CategoriesModule,
-    SeasonalTagModule,
     SeasonaltagsModule,
   ],
   controllers: [AppController],

@@ -12,6 +12,14 @@ export class SeasonaltagRepository {
   ) {}
 
   async create(payload: CreateSeasonaltagDto): Promise<Seasonaltag> {
+    const isSlugExist = await this.seasonaltagModel
+      .findOne({
+        slug: payload.slug,
+      })
+      .lean();
+    if (isSlugExist) {
+      throw new NotFoundException('Slug already exists');
+    }
     return await this.seasonaltagModel.create(payload);
   }
 
@@ -27,7 +35,18 @@ export class SeasonaltagRepository {
     return result;
   }
 
-  async update(id: string, payload: UpdateSeasonaltagDto): Promise<Seasonaltag> {
+  async update(
+    id: string,
+    payload: UpdateSeasonaltagDto,
+  ): Promise<Seasonaltag> {
+    const isSlugExist = await this.seasonaltagModel
+      .findOne({
+        slug: payload.slug,
+      })
+      .lean();
+    if (isSlugExist) {
+      throw new NotFoundException('Slug already exists');
+    }
     const result = await this.seasonaltagModel.findByIdAndUpdate(id, payload, {
       new: true,
     });
@@ -43,5 +62,14 @@ export class SeasonaltagRepository {
       throw new NotFoundException(`Seasonaltag is not found with the ${id}`);
     }
     return result;
+  }
+
+  async isSlugAvailable(slug: string, id?: string): Promise<boolean> {
+    const query = { slug: slug };
+    if (id) {
+      query['_id'] = { $ne: id };
+    }
+    const count = await this.seasonaltagModel.countDocuments(query);
+    return count === 0;
   }
 }
